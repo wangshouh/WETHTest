@@ -40,7 +40,7 @@ contract WETH9 {
     }
 
     function withdraw(uint256 wad) public {
-        require(balanceOf[msg.sender] >= wad);
+        require(balanceOf[msg.sender] >= wad, "fail");
         balanceOf[msg.sender] -= wad;
         address payable withdrawAddress = payable(msg.sender);
         withdrawAddress.transfer(wad);
@@ -59,6 +59,13 @@ contract WETH9 {
 
     function transfer(address dst, uint256 wad) public returns (bool) {
         return transferFrom(msg.sender, dst, wad);
+    }
+
+    function errorTansfer(address dst, uint256 wad) public {
+      uint256 srcBalance = balanceOf[msg.sender];
+      uint256 dstBalance = balanceOf[dst];
+      balanceOf[msg.sender] = srcBalance - wad;
+      balanceOf[dst] = dstBalance + wad;
     }
 
     function transferFrom(

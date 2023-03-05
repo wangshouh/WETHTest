@@ -13,11 +13,47 @@ contract WETHTest is Test {
         weth = new WETH9();
     }
 
-    function testDesposit(uint96 amount) public {
-        (bool sent, ) = address(weth).call{value: amount, gas: 1 ether}("");
-        require(sent, "Send ETH");
-        assertEq(weth.balanceOf(address(this)), amount);
+    function testDesposit(uint96 amount, uint96 preBalance, uint96 preETHBalance) public {
+        vm.assume(preBalance > amount);
+
+        address payable tester = payable(address(0x1337));
+        
+        deal(tester, preETHBalance);
+        deal(address(weth), tester, preBalance);
+
+        deal(address(weth), uint256(amount) + 2300);
+        
+        vm.prank(tester);
         weth.withdraw(amount);
-        assertEq(weth.balanceOf(address(this)), 0);
+
+        assertEq(weth.balanceOf(tester), preBalance - amount);
+        assertEq(tester.balance, uint(preETHBalance) + uint(amount));
+    }
+
+    function test_ERC20_selfTransfer(uint256 value, uint96 preBalance) public {
+        vm.assume(preBalance > value);
+
+        address payable tester = payable(address(0x1337));
+
+        deal(address(weth), tester, preBalance);
+
+        vm.prank(tester);
+        weth.transfer(tester, value);
+
+        assertEq(weth.balanceOf(tester), preBalance);
+    }
+
+    function testFail_selfTransfer(uint256 value, uint96 preBalance) public {
+        vm.assume(preBalance > value);
+        vm.assume(value > 0);
+
+        address payable tester = payable(address(0x1337));
+
+        deal(address(weth), tester, preBalance);
+
+        vm.prank(tester);
+        weth.errorTansfer(tester, value);
+
+        assertEq(weth.balanceOf(tester), preBalance);
     }
 }
