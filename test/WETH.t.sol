@@ -43,17 +43,4 @@ contract WETHTest is Test {
         assertEq(weth.balanceOf(tester), preBalance);
     }
 
-    function testFail_selfTransfer(uint256 value, uint96 preBalance) public {
-        vm.assume(preBalance > value);
-        vm.assume(value > 0);
-
-        address payable tester = payable(address(0x1337));
-
-        deal(address(weth), tester, preBalance);
-
-        vm.prank(tester);
-        weth.errorTansfer(tester, value);
-
-        assertEq(weth.balanceOf(tester), preBalance);
-    }
 }

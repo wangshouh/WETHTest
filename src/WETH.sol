@@ -61,13 +61,6 @@ contract WETH9 {
         return transferFrom(msg.sender, dst, wad);
     }
 
-    function errorTansfer(address dst, uint256 wad) public {
-      uint256 srcBalance = balanceOf[msg.sender];
-      uint256 dstBalance = balanceOf[dst];
-      balanceOf[msg.sender] = srcBalance - wad;
-      balanceOf[dst] = dstBalance + wad;
-    }
-
     function transferFrom(
         address src,
         address dst,
