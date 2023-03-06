@@ -43,4 +43,7 @@ contract WETHTest is Test {
         assertEq(weth.balanceOf(tester), preBalance);
     }
 
+    function invariant_wethSupplyIsAlwaysZero() public {
+        assertEq(0, weth.totalSupply());
+    }
 }
