@@ -16,7 +16,10 @@ contract WETHInvariants is Test {
         targetContract(address(handler));
     }
 
-    function invariant_wethSupplyIsAlwaysZero() public {
-        assertEq(0, weth.totalSupply());
+    function invariant_solvencyDeposits() public {
+        assertEq(
+        address(weth).balance,
+        handler.ghost_depositSum() - handler.ghost_withdrawSum()
+        );
     }
 }
