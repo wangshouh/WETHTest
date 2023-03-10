@@ -18,8 +18,8 @@ contract WETHInvariants is Test {
 
     function invariant_solvencyDeposits() public {
         assertEq(
-        address(weth).balance,
-        handler.ghost_depositSum() - handler.ghost_withdrawSum()
+            address(weth).balance,
+            handler.ghost_depositSum() - handler.ghost_withdrawSum()
         );
     }
 }
