@@ -22,4 +22,15 @@ library LibAddressSet {
 			return address(0);
 		}
 	}
+
+	function forEach(
+		AddressSet storage s,
+		function(address) external returns (uint256) func
+	) internal returns (uint256[] memory) {
+		uint256[] memory arr = new uint256[](s.addrs.length);
+		for (uint256 i; i < s.addrs.length; ++i) {
+			arr[i] = func(s.addrs[i]);
+		}
+		return arr;
+	}
 }

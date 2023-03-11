@@ -17,9 +17,20 @@ contract WETHInvariants is Test {
     }
 
     function invariant_solvencyDeposits() public {
+        uint256[] memory balanceArray = handler.actorForEach(weth.balanceOf);
+        uint256 actorWETHSum = sum(balanceArray);
         assertEq(
             address(weth).balance,
-            handler.ghost_depositSum() - handler.ghost_withdrawSum()
+            // handler.ghost_depositSum() - handler.ghost_withdrawSum()
+            actorWETHSum
         );
+    }
+
+    function sum(uint256[] memory uintList) internal pure returns (uint256) {
+        uint256 sumResult = 0;
+        for (uint256 i; i < uintList.length; ++i) {
+            sumResult += uintList[i];
+        }
+        return sumResult;
     }
 }

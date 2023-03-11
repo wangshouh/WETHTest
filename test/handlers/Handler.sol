@@ -38,6 +38,12 @@ contract Handler is StdUtils, StdCheats, CommonBase {
         vm.stopPrank();
     }
 
+    function actorForEach(
+        function(address) external returns (uint256) func
+    ) public returns (uint256[] memory) {
+        return _actors.forEach(func);
+    }
+
     function deposit(uint256 amount) public addActor(amount) {
         amount = bound(amount, 0, MAX_TRANSFER);
         weth.deposit{ value: amount }();
