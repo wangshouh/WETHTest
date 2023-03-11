@@ -6,6 +6,7 @@ import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {CommonBase} from "forge-std/Base.sol";
 import {LibAddressSet, AddressSet} from "../helpers/AddressSet.sol";
+// import {console} from "forge-std/console.sol";
 
 contract Handler is StdUtils, StdCheats, CommonBase {
     WETH9 public weth;
@@ -29,6 +30,8 @@ contract Handler is StdUtils, StdCheats, CommonBase {
         vm.startPrank(msg.sender);
         _;
         vm.stopPrank();
+        // console.logUint(address(weth).balance);
+        // emit log_named_uint("ETHBalance", address(weth).balance);
     }
 
     modifier useActor(uint256 seed) {
@@ -36,6 +39,8 @@ contract Handler is StdUtils, StdCheats, CommonBase {
         vm.startPrank(addr);
         _;
         vm.stopPrank();
+        // console.logUint(address(weth).balance);
+        // emit log_named_uint("ETHBalance", address(weth).balance);
     }
 
     function actorForEach(
@@ -61,5 +66,28 @@ contract Handler is StdUtils, StdCheats, CommonBase {
         (bool success,) = address(weth).call{ value: amount }("");
         require(success, "sendFallback failed");
         ghost_depositSum += amount;
+    }
+
+    function approve(uint256 amount, uint256 approverSeed) public useActor(amount) {
+        address approver = _actors.rand(approverSeed);
+        weth.approve(approver, amount);
+    }
+
+    function transfer(uint256 amount, address receiver) public useActor(amount) {
+        amount = bound(amount, 0, weth.balanceOf(msg.sender));
+        if (!_actors.saved[receiver]) {
+            _actors.addrs.push(receiver);
+            _actors.saved[receiver] = true;
+            weth.transfer(receiver, amount);
+        } else {
+            weth.transfer(receiver, amount);
+        }
+    }
+
+    function transferFrom(uint256 amount, uint256 senerSeed, uint256 receiverSeed) public {
+        address receiver = _actors.rand(receiverSeed);
+        address sender = _actors.rand(senerSeed);
+        amount = bound(amount, 0, weth.balanceOf(sender));
+        weth.transferFrom(sender, receiver, amount);
     }
 }
