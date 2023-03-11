@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.13;
 
+
 struct AddressSet {
-    address[] addrs;
-    mapping(address => bool) saved;
+	address[] addrs;
+	mapping(address => bool) saved;
 }
 
 library LibAddressSet {

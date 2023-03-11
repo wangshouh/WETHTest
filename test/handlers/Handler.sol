@@ -5,14 +5,15 @@ import {WETH9} from "../../src/WETH.sol";
 import {StdCheats} from "forge-std/StdCheats.sol";
 import {StdUtils} from "forge-std/StdUtils.sol";
 import {CommonBase} from "forge-std/Base.sol";
-import {AddressSet, LibAddressSet} from "../helpers/AddressSet.sol";
+import {LibAddressSet, AddressSet} from "../helpers/AddressSet.sol";
 
 contract Handler is StdUtils, StdCheats, CommonBase {
     WETH9 public weth;
 
-    uint256 public constant ETH_SUPPLY = 120_500_000 ether;
     uint256 public ghost_depositSum;
     uint256 public ghost_withdrawSum;
+
+    uint256 constant MAX_TRANSFER = 12_000_000 ether;
 
     using LibAddressSet for AddressSet;
 
@@ -38,19 +39,19 @@ contract Handler is StdUtils, StdCheats, CommonBase {
     }
 
     function deposit(uint256 amount) public addActor(amount) {
-        amount = bound(amount, 0, address(this).balance);
+        amount = bound(amount, 0, MAX_TRANSFER);
         weth.deposit{ value: amount }();
         ghost_depositSum += amount;
     }
 
     function withdraw(uint256 amount) public useActor(amount) {
-        amount = bound(amount, 0, weth.balanceOf(address(this)));
+        amount = bound(amount, 0, weth.balanceOf(msg.sender));
         weth.withdraw(amount);
         ghost_withdrawSum += amount;
     }
 
-    function sendFallback(uint256 amount) public {
-        amount = bound(amount, 0, address(this).balance);
+    function sendFallback(uint256 amount) public addActor(amount) {
+        amount = bound(amount, 0, MAX_TRANSFER);
         (bool success,) = address(weth).call{ value: amount }("");
         require(success, "sendFallback failed");
         ghost_depositSum += amount;
