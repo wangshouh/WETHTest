@@ -13,6 +13,7 @@ contract Handler is StdUtils, StdCheats, CommonBase {
 
     uint256 public ghost_depositSum;
     uint256 public ghost_withdrawSum;
+    uint256 public ghost_forcePushSum;
 
     uint256 constant MAX_TRANSFER = 12_000_000 ether;
 
@@ -89,5 +90,20 @@ contract Handler is StdUtils, StdCheats, CommonBase {
         address sender = _actors.rand(senerSeed);
         amount = bound(amount, 0, weth.balanceOf(sender));
         weth.transferFrom(sender, receiver, amount);
+    }
+
+    function forcePush(
+        uint256 amount
+    ) public {
+        amount = bound(amount, 0, MAX_TRANSFER);
+        deal(address(this), amount);
+        new ForcePush{ value: amount }(address(weth));
+        ghost_forcePushSum += amount;
+    }
+}
+
+contract ForcePush {
+    constructor(address dst) payable {
+        selfdestruct(payable(dst));
     }
 }
