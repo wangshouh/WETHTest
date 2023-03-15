@@ -3,6 +3,12 @@ src = 'src'
 out = 'out'
 libs = ['lib']
 
+[profile.default.model_checker]
+contracts = {'test/SMTChecker/formalVerify.sol' = ['FormalVerify']}
+engine = 'chc'
+timeout = 10000
+targets = ['assert']
+
 [fuzz]
 runs = 1024
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config
